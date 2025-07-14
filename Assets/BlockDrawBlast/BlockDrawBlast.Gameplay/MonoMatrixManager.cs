@@ -15,8 +15,10 @@ namespace BlockDrawBlast.Gameplay
 
         public void Initialize(int rows, int columns)
         {
-            _unmanagedBockDataArray = new BlockData[rows * columns];
-            _unmanagedTileDataArray = new TileData[rows * columns];
+            var initialCapacity = rows * columns;
+            
+            _unmanagedBockDataArray = new BlockData[initialCapacity];
+            _unmanagedTileDataArray = new TileData[initialCapacity];
         }
 
         private bool TryPlaceBlock(MatrixPosition position, out BlockData blockData)
