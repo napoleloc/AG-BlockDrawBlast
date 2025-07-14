@@ -1,15 +1,12 @@
-﻿using System.Runtime.InteropServices;
-using Unity.Mathematics;
+using System.Runtime.InteropServices;
 
 namespace BlockDrawBlast.Gameplay
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct TileData
     {
-        public int row;
-        public int column;
-        public TileState tileState;
-        public float3 worldPosition;
+        public MatrixPosition position;
+        public TileFlag flag;
     }
 }
 

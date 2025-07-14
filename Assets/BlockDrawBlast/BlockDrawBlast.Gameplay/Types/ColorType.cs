@@ -1,4 +1,4 @@
-﻿namespace BlockDrawBlast.Gameplay
+namespace BlockDrawBlast.Gameplay
 {
     public enum ColorType : byte
     {
