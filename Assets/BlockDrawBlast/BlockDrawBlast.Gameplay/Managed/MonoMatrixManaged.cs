@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using EncosyTower.Logging;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -14,13 +15,20 @@ namespace BlockDrawBlast.Gameplay
         private NativeArray<BlockData> _unmanagedBockDataArray;
         private NativeArray<TileData> _unmanagedTileDataArray;
         private NativeArray<int> _keyCountArray;
+        private float3 _originPosition;
         
         private bool _isInitialized;
+
+        private void Start()
+        {
+            _originPosition = CalculateOriginPosition(_rows, _columns);
+        }
 
         public void PreparedWhenStartGame(int rows, int columns, ReadOnlySpan<TileData> preparedTileDataArray, ReadOnlySpan<BlockData> preparedBlockDataArray)
         {
             _rows = rows;
             _columns = columns;
+            _originPosition = CalculateOriginPosition(rows, columns);
             
             var initialCapacity = rows * columns;
             
@@ -78,16 +86,6 @@ namespace BlockDrawBlast.Gameplay
 
             // Update tile flag
             unmanagedTileData.flag |= TileFlag.Occupied;
-            switch (blockData.blockType)
-            {
-                case BlockType.Key:
-                    unmanagedTileData.flag |= TileFlag.HasKey;
-                    break;
-                case BlockType.Locked:
-                    unmanagedTileData.flag |= TileFlag.Locked;
-                    break;
-            }
-
             _unmanagedTileDataArray[index] = unmanagedTileData;
             
             return true;
@@ -144,6 +142,24 @@ namespace BlockDrawBlast.Gameplay
             }
             
             _keyCountArray[0] = availableKeys;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public MatrixPosition WorldToMatrixPosition(float3 worldPosition)
+        {
+            // Implementation depends on your grid system
+            var row = (worldPosition - _originPosition).y;
+            var col = (worldPosition - _originPosition).x;
+            
+            return new MatrixPosition((int)math.round(-row), (int)math.round(col));
+        }
+        
+        private float3 CalculateOriginPosition(int rowCount, int columnCount)
+        {
+            var offsetY = Mathf.Floor(rowCount / 2.0f);
+            var offsetX = Mathf.Floor(columnCount / 2.0f);
+
+            return new float3(-offsetX, offsetY, 0);
         }
         
         public void Dispose()

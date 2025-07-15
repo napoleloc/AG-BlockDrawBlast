@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using EncosyTower.Logging;
 using EncosyTower.UnityExtensions;
 using Unity.Mathematics;
 using UnityEngine;
@@ -251,7 +252,8 @@ namespace BlockDrawBlast.Gameplay
                 return new float3(screenPosition.x, screenPosition.y, 0f);
             }
             
-            var screenPos = new Vector3(screenPosition.x, screenPosition.y, _worldPlaneDistance);
+            var distanceToPlane = math.abs(_mainCamera.transform.position.z - _worldPlaneDistance);
+            var screenPos = new Vector3(screenPosition.x, screenPosition.y, distanceToPlane);
             var worldPos = _mainCamera.ScreenToWorldPoint(screenPos);
     
             return RoundToDecimalPlaces(worldPos, 3);

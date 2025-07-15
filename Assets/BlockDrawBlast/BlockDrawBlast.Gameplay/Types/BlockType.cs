@@ -6,7 +6,6 @@ namespace BlockDrawBlast.Gameplay
         Key = 1,
         Locked = 2,
         Explosive = 3,
-        Immovable = 4
     }
 }
 

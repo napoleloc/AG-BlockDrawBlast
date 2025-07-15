@@ -12,13 +12,14 @@ namespace BlockDrawBlast.Gameplay
     {
         [SerializeField] private LevelDataTableAsset _levelDataTable;
         [SerializeField] private MonoInputReceiver _inputReceiver;
+        
+        [Title("Managed", titleAlignment: TitleAlignments.Centered)]
+        [SerializeField] private MonoDrawingManaged _monoDrawingManaged;
+        [SerializeField] private MonoMatrixManaged _monoMatrixManaged;
+        [SerializeField] private MonoStackManaged _monoStackManaged;
 
         [Title("Debugging", titleAlignment: TitleAlignments.Centered)] 
         [SerializeField] private GameplayStatus _gameplayStatus;
-
-        private MonoDrawingManaged _monoDrawingManaged;
-        private MonoMatrixManaged _monoMatrixManaged;
-        private MonoStackManaged _monoStackManaged;
         
         private int _currentLevel;
 
@@ -32,14 +33,14 @@ namespace BlockDrawBlast.Gameplay
         private void HandleTouchStart(float3 worldPosition)
         {
             // Convert world position to matrix position if needed
-             var matrixPosition = WorldToMatrixPosition(worldPosition);
+            var matrixPosition = _monoMatrixManaged.WorldToMatrixPosition(worldPosition);
             _monoDrawingManaged?.StartDrawing(matrixPosition);
         }
 
         private void HandleTouchMove(float3 worldPosition)
         {
             // Convert world position to matrix position if needed
-            var matrixPosition = WorldToMatrixPosition(worldPosition);
+            var matrixPosition = _monoMatrixManaged.WorldToMatrixPosition(worldPosition);
             _monoDrawingManaged?.ContinueDrawing(matrixPosition);
             
             DevLoggerAPI.LogInfo($"matrix-position: {matrixPosition}");
@@ -50,16 +51,6 @@ namespace BlockDrawBlast.Gameplay
             _monoDrawingManaged?.EndDrawing();
         }
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private MatrixPosition WorldToMatrixPosition(float3 worldPosition)
-        {
-            // Implementation depends on your grid system
-            var row = (int)math.round(worldPosition.y);
-            var col = (int)math.round(worldPosition.z);
-            
-            return new MatrixPosition(row, col);
-        }
-
         private void OnStartGame()
         {
             if (_gameplayStatus == GameplayStatus.StartGame)
