@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using BlockDrawBlast.Database;
 using BlockDrawBlast.Extensions;
 using EncosyTower.Logging;

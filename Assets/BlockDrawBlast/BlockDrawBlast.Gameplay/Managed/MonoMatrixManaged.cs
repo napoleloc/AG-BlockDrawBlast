@@ -11,6 +11,7 @@ namespace BlockDrawBlast.Gameplay
     {
         [SerializeField] private int _rows;
         [SerializeField] private int _columns;
+        [SerializeField] private MonoMatrixVisual _monoMatrixVisual;
         
         private NativeArray<BlockData> _unmanagedBockDataArray;
         private NativeArray<TileData> _unmanagedTileDataArray;
@@ -55,6 +56,7 @@ namespace BlockDrawBlast.Gameplay
                 }
                 
                 _unmanagedBockDataArray[index] = preparedBlockData;
+                _monoMatrixVisual.CreateAsync(position, preparedBlockData, default);
             }
             
             _isInitialized = true;
