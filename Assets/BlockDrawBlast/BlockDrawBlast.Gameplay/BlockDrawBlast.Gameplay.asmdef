@@ -3,6 +3,9 @@
     "rootNamespace": "BlockDrawBlast.Gameplay",
     "references": [
         "EncosyTower.Core",
+        "LitMotion",
+        "LitMotion.Animation",
+        "LitMotion.Extensions",
         "Unity.Addressables",
         "Unity.Burst",
         "Unity.Collections",

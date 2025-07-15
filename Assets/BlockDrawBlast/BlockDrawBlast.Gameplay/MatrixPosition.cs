@@ -16,9 +16,10 @@ namespace BlockDrawBlast.Gameplay
             return RowIndex * columns + ColumnIndex;
         }
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MatrixPosition FromIndex(int index, int column)
         {
-            return new(index / column, index % column);
+            return new MatrixPosition(index / column, index % column);
         }
     }
 }

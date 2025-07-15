@@ -1,9 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
-using Google.Apis.Sheets.v4.Data;
 using Unity.Burst;
-using Unity.Collections;
-using Unity.Mathematics;
 
 namespace BlockDrawBlast.Gameplay
 {

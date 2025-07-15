@@ -5,7 +5,6 @@ namespace BlockDrawBlast.Gameplay
         Continuous, 
         Individual,
         Line,
-        Shape
     }
 }
 
