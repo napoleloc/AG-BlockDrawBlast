@@ -6,10 +6,13 @@
         "LitMotion",
         "LitMotion.Animation",
         "LitMotion.Extensions",
+        "UniTask",
+        "UniTask.Addressables",
         "Unity.Addressables",
         "Unity.Burst",
         "Unity.Collections",
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

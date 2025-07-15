@@ -8,13 +8,12 @@ namespace BlockDrawBlast.Gameplay
 {
     public class MonoDrawingManaged : MonoBehaviour
     {
-        [SerializeField] private MonoMatrixManaged _matrixManaged;
-        [SerializeField] private MonoStackManaged _stackManaged;
+        [SerializeField] private MonoMatrixManaged _monoMatrixManaged;
+        [SerializeField] private MonoStackManaged _monoStackManaged;
         [SerializeField] private DrawingPattern _drawingPattern;
         
         private readonly FasterList<DrawingBlockContext> _currentDrawingBlocks = new();
         private bool _isDrawing;
-        private int _currentBlockIndex;
 
         public System.Action OnDrawingCompleted;
         public System.Action OnDrawingCanceled;

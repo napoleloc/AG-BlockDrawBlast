@@ -24,6 +24,10 @@ namespace BlockDrawBlast.Gameplay
             
             var initialCapacity = rows * columns;
             
+            if(_unmanagedBockDataArray.IsCreated) _unmanagedBockDataArray.Dispose();
+            if (_unmanagedTileDataArray.IsCreated) _unmanagedTileDataArray.Dispose();
+            if(_keyCountArray.IsCreated) _keyCountArray.Dispose();
+            
             _unmanagedBockDataArray = new NativeArray<BlockData>(initialCapacity, Allocator.Persistent);
             _unmanagedTileDataArray = new NativeArray<TileData>(initialCapacity, Allocator.Persistent);
             _keyCountArray = new NativeArray<int>(1, Allocator.Persistent);

@@ -1,6 +1,6 @@
 namespace BlockDrawBlast.Gameplay
 {
-    public struct BlockStackData
+    public struct StackBlockData
     {
         public ColorType colorType;
         public int count;
