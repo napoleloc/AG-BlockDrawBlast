@@ -90,6 +90,8 @@ namespace BlockDrawBlast.Gameplay
             unmanagedTileData.flag |= TileFlag.Occupied;
             _unmanagedTileDataArray[index] = unmanagedTileData;
             
+            _monoMatrixVisual.CreateAsync(position, blockData, default);
+            
             return true;
         }
 
