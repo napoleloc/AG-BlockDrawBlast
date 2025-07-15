@@ -17,7 +17,7 @@ namespace BlockDrawBlast.Gameplay
         
         private bool _isInitialized;
 
-        public void Initialize(int rows, int columns)
+        public void PreparedWhenStartGame(int rows, int columns, ReadOnlySpan<TileData> preparedTileDataArray, ReadOnlySpan<BlockData> preparedBlockDataArray)
         {
             _rows = rows;
             _columns = columns;
@@ -32,15 +32,21 @@ namespace BlockDrawBlast.Gameplay
             _unmanagedTileDataArray = new NativeArray<TileData>(initialCapacity, Allocator.Persistent);
             _keyCountArray = new NativeArray<int>(1, Allocator.Persistent);
             
-            // Initialize tiles
-            for (var i = 0; i < initialCapacity; i++)
+            preparedTileDataArray.CopyTo(_unmanagedTileDataArray);
+
+            for (int i = 0; i < preparedBlockDataArray.Length; i++)
             {
-                var position = MatrixPosition.FromIndex(i, _columns);
-                _unmanagedTileDataArray[i] = new TileData
+                var preparedBlockData = preparedBlockDataArray[i];
+                var position = preparedBlockData.position;
+                var index = position.ToIndex(_columns);
+                
+                if (index < 0 || index >= _unmanagedBockDataArray.Length)
                 {
-                    position = position,
-                    flag = TileFlag.None
-                };
+                    DevLoggerAPI.LogError($"Invalid index: {index}");
+                    continue;
+                }
+                
+                _unmanagedBockDataArray[index] = preparedBlockData;
             }
             
             _isInitialized = true;

@@ -15,7 +15,7 @@ namespace BlockDrawBlast.Gameplay
 
         private int _currentBlockIndex;
         
-        public void Initialize(ReadOnlySpan<StackBlockData> dataSpan)
+        public void PreparedWhenStartGame(ReadOnlySpan<StackBlockData> dataSpan)
         {
             var capacity = dataSpan.Length;
 

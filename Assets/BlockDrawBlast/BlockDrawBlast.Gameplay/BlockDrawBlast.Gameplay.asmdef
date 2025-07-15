@@ -11,6 +11,7 @@
         "Unity.Addressables",
         "Unity.Burst",
         "Unity.Collections",
+        "Unity.InputSystem",
         "Unity.Mathematics",
         "Unity.TextMeshPro"
     ],
