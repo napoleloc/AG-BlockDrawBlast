@@ -1,6 +1,11 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using EncosyTower.Ids;
 using EncosyTower.Logging;
+using EncosyTower.Types;
+using EncosyTower.UnityExtensions;
+using EncosyTower.Vaults;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -9,6 +14,8 @@ namespace BlockDrawBlast.Gameplay
 {
     public class MonoMatrixManaged : MonoBehaviour, IDisposable
     {
+        public static readonly Id<MonoMatrixManaged> TypeId = Type<MonoMatrixManaged>.Id;
+        
         [SerializeField] private int _rows;
         [SerializeField] private int _columns;
         [SerializeField] private MonoMatrixVisual _monoMatrixVisual;
@@ -20,9 +27,16 @@ namespace BlockDrawBlast.Gameplay
         
         private bool _isInitialized;
 
-        private void Start()
+        private async void Awake()
         {
-            _originPosition = CalculateOriginPosition(_rows, _columns);
+            _monoMatrixVisual = GetComponent<MonoMatrixVisual>();
+            
+            GlobalObjectVault.TryAdd(TypeId, this);
+        }
+
+        private void OnDestroy()
+        {
+            GlobalObjectVault.TryRemove(TypeId, out _);
         }
 
         public void PreparedWhenStartGame(int rows, int columns, ReadOnlySpan<TileData> preparedTileDataArray, ReadOnlySpan<BlockData> preparedBlockDataArray)

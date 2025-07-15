@@ -1,20 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EncosyTower.AddressableKeys;
 using EncosyTower.Collections;
 using EncosyTower.Common;
+using EncosyTower.Ids;
 using EncosyTower.StringIds;
+using EncosyTower.Types;
 using EncosyTower.UnityExtensions;
+using EncosyTower.Vaults;
 using UnityEngine;
 
 namespace BlockDrawBlast.Gameplay
 {
     public class MonoBlockVisualPooler : MonoBehaviour
     {
+        public static readonly Id<MonoBlockVisualPooler> TypeId = Type<MonoBlockVisualPooler>.Id;
+        
         private readonly Dictionary<StringId, MonoBlockVisualPool> _idToPool = new();
         private readonly FasterList<MonoBlockVisualIdentifier> _blockVisualIds = new();
+
+        private void Awake()
+        {
+            GlobalObjectVault.TryAdd(TypeId, this);
+        }
+
+        private void OnDestroy()
+        {
+            GlobalObjectVault.TryRemove(TypeId, out _);
+        }
 
         public UniTask<Option<MonoBlockVisualIdentifier>> GetBlockVisualAsync(string assetKey, CancellationToken token)
         {

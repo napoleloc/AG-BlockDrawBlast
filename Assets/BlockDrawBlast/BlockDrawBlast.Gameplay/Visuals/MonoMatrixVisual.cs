@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -12,6 +13,11 @@ namespace BlockDrawBlast.Gameplay
         [SerializeField] private MonoBlockVisualPooler _blockVisualPooler;
         
         private readonly Dictionary<MatrixPosition, MonoBlockVisual> _coordToBlockVisual = new();
+
+        private void Awake()
+        {
+            
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public UniTask CreateAsync(MatrixPosition position, BlockData blockData, CancellationToken token)
