@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EncosyTower.AddressableKeys;
-using EncosyTower.Collections;
 using EncosyTower.Common;
 using EncosyTower.Ids;
+using EncosyTower.Logging;
 using EncosyTower.StringIds;
 using EncosyTower.Types;
 using EncosyTower.UnityExtensions;
@@ -20,7 +19,6 @@ namespace BlockDrawBlast.Gameplay
         public static readonly Id<MonoBlockVisualPooler> TypeId = Type<MonoBlockVisualPooler>.Id;
         
         private readonly Dictionary<StringId, MonoBlockVisualPool> _idToPool = new();
-        private readonly FasterList<MonoBlockVisualIdentifier> _blockVisualIds = new();
 
         private void Awake()
         {
@@ -32,10 +30,10 @@ namespace BlockDrawBlast.Gameplay
             GlobalObjectVault.TryRemove(TypeId, out _);
         }
 
-        public UniTask<Option<MonoBlockVisualIdentifier>> GetBlockVisualAsync(string assetKey, CancellationToken token)
+        public UniTask<Option<MonoBlockVisualIdentifier>> GetBlockVisualFromPoolAsync(string assetKey, BlockData blockData, CancellationToken token)
         {
             var key = MakeBlockVisualKey(assetKey);
-            return GetBlockVisualAsync(key, token);
+            return GetBlockVisualFromPoolAsync(key, blockData, token);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -45,7 +43,7 @@ namespace BlockDrawBlast.Gameplay
             return new BlockVisualKey(srt, id);
         }
         
-        internal async UniTask<Option<MonoBlockVisualIdentifier>> GetBlockVisualAsync(BlockVisualKey key, CancellationToken token)
+        internal async UniTask<Option<MonoBlockVisualIdentifier>> GetBlockVisualFromPoolAsync(BlockVisualKey key, BlockData blockData, CancellationToken token)
         {
             if (token.IsCancellationRequested)
             {
@@ -70,15 +68,55 @@ namespace BlockDrawBlast.Gameplay
                 
                 pool.Initialize(source);
             }
+
+            var identifierOpt = pool.GetBlockVisualFromPool(key.Id);
+
+            if (identifierOpt.TryValue(out var identifier) && identifier.MonoBlockVisual is IMonoBlockVisualCreateAsync createAsync)
+            {
+                await createAsync.OnCreateAsync(blockData, token);
+
+                if (token.IsCancellationRequested)
+                {
+                    ReturnBlockVisualToPool(identifier);
+                    return default;
+                }
+            }
             
-            return default;
+            return identifierOpt;
+        }
+
+        public bool ReturnBlockVisualToPool(IMonoBlockVisual blockVisual)
+        {
+            if (blockVisual is not Component component)
+            {
+                return false;
+            }
+
+            if (component.TryGetComponent(out MonoBlockVisualIdentifier identifier) == false)
+            {
+                DevLoggerAPI.LogError("BlockVisualIdentifier is not found.");
+                return false;
+            }
+            
+            return ReturnBlockVisualToPool(identifier);
+        }
+        
+        public bool ReturnBlockVisualToPool(MonoBlockVisualIdentifier identifier)
+        {
+            if(_idToPool.TryGetValue(identifier.KeyId, out var pool) == false)
+            {
+                return false;
+            }
+            
+            pool.ReturnBlockVisualToPool(identifier);
+            return true;
         }
 
         private MonoBlockVisualPool GetPoolFor(BlockVisualKey key)
         {
             if (_idToPool.TryGetValue(key.Id, out var pool) == false)
             {
-                _idToPool[key.Id] = pool = new MonoBlockVisualPool(transform, transform, _blockVisualIds);
+                _idToPool[key.Id] = pool = new MonoBlockVisualPool(transform, transform);
             }
             
             return pool;

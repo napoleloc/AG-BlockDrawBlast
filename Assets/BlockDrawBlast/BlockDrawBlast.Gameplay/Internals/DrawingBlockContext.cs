@@ -13,7 +13,7 @@ namespace BlockDrawBlast.Gameplay
             return new BlockData
             {
                 colorType = colorType,
-                blockType = BlockType.Normal,
+                blockFlag = BlockFlag.Normal,
                 position = position,
             };
         }

@@ -47,7 +47,7 @@ namespace BlockDrawBlast.Database
         public int row;
         public int column;
         
-        public BlockType blockType;
+        public BlockFlag blockFlag;
         public ColorType colorType;
         
         public int requiredKeys;

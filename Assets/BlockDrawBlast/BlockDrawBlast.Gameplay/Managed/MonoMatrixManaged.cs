@@ -39,7 +39,11 @@ namespace BlockDrawBlast.Gameplay
             GlobalObjectVault.TryRemove(TypeId, out _);
         }
 
-        public void PreparedWhenStartGame(int rows, int columns, ReadOnlySpan<TileData> preparedTileDataArray, ReadOnlySpan<BlockData> preparedBlockDataArray)
+        public void PreparedWhenStartGame(
+            int rows
+            , int columns
+            , ReadOnlySpan<TileData> preparedTileDataArray
+            , ReadOnlySpan<BlockData> preparedBlockDataArray)
         {
             _rows = rows;
             _columns = columns;
@@ -70,7 +74,7 @@ namespace BlockDrawBlast.Gameplay
                 }
                 
                 _unmanagedBockDataArray[index] = preparedBlockData;
-                _monoMatrixVisual.CreateAsync(position, preparedBlockData, default);
+                _monoMatrixVisual.CreateAsync(position, preparedBlockData);
             }
             
             _isInitialized = true;
@@ -104,7 +108,7 @@ namespace BlockDrawBlast.Gameplay
             unmanagedTileData.flag |= TileFlag.Occupied;
             _unmanagedTileDataArray[index] = unmanagedTileData;
             
-            _monoMatrixVisual.CreateAsync(position, blockData, default);
+            _monoMatrixVisual.CreateAsync(position, blockData);
             
             return true;
         }
@@ -138,7 +142,7 @@ namespace BlockDrawBlast.Gameplay
             for (var index = 0; index < _unmanagedBockDataArray.Length; index++)
             {
                 var unmanagedBlockData = _unmanagedBockDataArray[index];
-                if (unmanagedBlockData.blockType != BlockType.Locked || unmanagedBlockData.requiredKeys <= 0)
+                if (unmanagedBlockData.blockFlag != BlockFlag.Locked || unmanagedBlockData.requiredKeys <= 0)
                 {
                     continue;
                 }

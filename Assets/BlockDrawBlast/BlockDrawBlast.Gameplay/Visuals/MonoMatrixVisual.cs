@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -12,7 +11,7 @@ namespace BlockDrawBlast.Gameplay
     {
         [SerializeField] private MonoBlockVisualPooler _blockVisualPooler;
         
-        private readonly Dictionary<MatrixPosition, MonoBlockVisual> _coordToBlockVisual = new();
+        private readonly Dictionary<MatrixPosition, IMonoBlockVisual> _coordToBlockVisual = new();
 
         private void Awake()
         {
@@ -20,14 +19,14 @@ namespace BlockDrawBlast.Gameplay
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public UniTask CreateAsync(MatrixPosition position, BlockData blockData, CancellationToken token)
+        public UniTask CreateAsync(MatrixPosition position, BlockData blockData)
         {
-            return CreateAsyncInternal(position, blockData, token);
+            return CreateAsyncInternal(position, blockData, default);
         }
         
         private async UniTask CreateAsyncInternal(MatrixPosition position, BlockData blockData, CancellationToken token)
         {
-            var assetKey = Constants.GetBlockPrefabPath(blockData.blockType);
+            var assetKey = Constants.GetBlockPrefabPath(blockData.blockFlag);
 
             if (string.IsNullOrEmpty(assetKey))
             {
@@ -35,7 +34,7 @@ namespace BlockDrawBlast.Gameplay
                 return;
             }
 
-            var identifierOpt = await _blockVisualPooler.GetBlockVisualAsync(assetKey, token);
+            var identifierOpt = await _blockVisualPooler.GetBlockVisualFromPoolAsync(assetKey, blockData, token);
 
             if (token.IsCancellationRequested)
             {
@@ -47,21 +46,9 @@ namespace BlockDrawBlast.Gameplay
                 return;
             }
             
-            var visual = identifier.Visual;
+            var blockVisual = identifier.MonoBlockVisual;
             
-            visual.BindToMaterial(default);
-            _coordToBlockVisual.TryAdd(position, visual);
-        }
-        
-        public void Release(MatrixPosition position)
-        {
-            if (_coordToBlockVisual.TryGetValue(position, out var visual) == false)
-            {
-                return;
-            }
-            
-            visual.gameObject.SetActive(false);
-            _coordToBlockVisual.Remove(position);
+            _coordToBlockVisual.TryAdd(position, blockVisual);
         }
     }
 }

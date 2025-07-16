@@ -13,14 +13,14 @@ namespace BlockDrawBlast.Gameplay
         public const string BLOCK_EXPLOSIVE = $"{PREFAB}-block-explosive";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetBlockPrefabPath(BlockType blockType)
+        public static string GetBlockPrefabPath(BlockFlag blockFlag)
         {
-            return blockType switch
+            return blockFlag switch
             {
-                BlockType.Normal => BLOCK_NORMAL,
-                BlockType.Key => BLOCK_KEY,
-                BlockType.Locked => BLOCK_LOCKED,
-                BlockType.Explosive => BLOCK_EXPLOSIVE,
+                BlockFlag.Normal => BLOCK_NORMAL,
+                BlockFlag.Key => BLOCK_KEY,
+                BlockFlag.Locked => BLOCK_LOCKED,
+                BlockFlag.Explosive => BLOCK_EXPLOSIVE,
                 _ => string.Empty
             };
         }

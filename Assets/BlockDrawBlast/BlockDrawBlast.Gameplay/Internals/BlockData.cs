@@ -3,7 +3,7 @@ namespace BlockDrawBlast.Gameplay
     public struct BlockData
     {
         public ColorType colorType;
-        public BlockType blockType;
+        public BlockFlag blockFlag;
         
         public MatrixPosition position;
         public int requiredKeys;

@@ -41,7 +41,7 @@ namespace BlockDrawBlast.Extensions
                 {
                     position = new MatrixPosition(block.row, block.column),
                     colorType = block.colorType,
-                    blockType = block.blockType,
+                    blockFlag = block.blockFlag,
                     requiredKeys = block.requiredKeys
                 };
             }
