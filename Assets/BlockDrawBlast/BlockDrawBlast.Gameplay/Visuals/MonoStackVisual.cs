@@ -33,29 +33,7 @@ namespace BlockDrawBlast.Gameplay
             
             _visibleBlocks[0].UpdateCount(newCount);
         }
-
-        public void SetEmptyStack()
-        {
-            var visibleBlocks = _visibleBlocks.AsSpan();
-            var length = visibleBlocks.Length;
-            
-            for (int index = 0; index < length; index++)
-            {
-                Destroy(visibleBlocks[index].gameObject);
-            }
-            
-            _visibleBlocks.Clear();
-        }
         
-        public void SetSingleBlockStack(StackBlockData currentBlockData)
-        {
-            
-        }
-        
-        public void SetTwoBlocks(StackBlockData currentBlockData, StackBlockData nextBlockData)
-        {
-            var visibleBlocks = _visibleBlocks.AsSpan();
-        }
 
         private void RefreshVisibleBlocks(ReadOnlySpan<StackBlockData> entries)
         {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using EncosyTower.Logging;
 using EncosyTower.UnityExtensions;
 using Unity.Mathematics;
 using UnityEngine;
@@ -30,11 +29,11 @@ namespace BlockDrawBlast.Gameplay
     
     public class MonoInputReceiver : MonoBehaviour
     {
-        [SerializeField] private Camera _mainCamera;
         [SerializeField] private float _clickTimeThreshold = 0.3f;
         [SerializeField] private float _clickDistanceThreshold = 10f;
         [SerializeField] private float _worldPlaneDistance = 10f;
-        
+
+        private Camera _mainCamera;
         private Touchscreen _touchscreen;
         private Mouse _mouse;
         private TouchInputData _currentTouchData;

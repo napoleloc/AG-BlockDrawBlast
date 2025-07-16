@@ -91,7 +91,7 @@ namespace BlockDrawBlast.Gameplay
 
             if (_currentBlockIndex >= _unmanagedDataArray.Length)
             {
-                _monoStackVisual.SetEmptyStack();
+                
                 return;
             }
             
@@ -106,23 +106,20 @@ namespace BlockDrawBlast.Gameplay
             {
                 case 0:
                 {
-                    _monoStackVisual.SetEmptyStack();
                     break;
                 }
                 case 1:
                 {
                     var currentBlockData = _unmanagedDataArray[_currentBlockIndex];
                     
-                    _monoStackVisual.SetSingleBlockStack(currentBlockData);
                     break;
                 }
 
-                case 2:
+                default:
                 {
                     var currentBlockData = _unmanagedDataArray[_currentBlockIndex];
                     var nextBlockData = _unmanagedDataArray[_currentBlockIndex + 1];
                     
-                    _monoStackVisual.SetTwoBlocks(currentBlockData, nextBlockData);
                     break;
                 }
             }
