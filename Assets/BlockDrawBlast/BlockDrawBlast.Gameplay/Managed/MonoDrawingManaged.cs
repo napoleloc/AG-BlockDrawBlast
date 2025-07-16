@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using EncosyTower.Collections;
+using EncosyTower.Ids;
+using EncosyTower.Types;
+using EncosyTower.Vaults;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -8,6 +11,8 @@ namespace BlockDrawBlast.Gameplay
 {
     public class MonoDrawingManaged : MonoBehaviour
     {
+        public static readonly Id<MonoDrawingManaged> TypeId = Type<MonoDrawingManaged>.Id;
+        
         [SerializeField] private MonoMatrixManaged _monoMatrixManaged;
         [SerializeField] private MonoStackManaged _monoStackManaged;
         [SerializeField] private DrawingPattern _drawingPattern;
@@ -20,6 +25,16 @@ namespace BlockDrawBlast.Gameplay
         public System.Action OnDrawingFailed;
         public System.Action<ReadOnlyMemory<DrawingBlockContext>> OnBlocksPlaced;
         public System.Action<ReadOnlyMemory<DrawingBlockContext>> OnDrawingUpdated;
+
+        private void Awake()
+        {
+            GlobalObjectVault.TryAdd(TypeId, this);
+        }
+        
+        private void OnDestroy()
+        {
+            GlobalObjectVault.TryRemove(TypeId, out _);
+        }
 
         public void StartDrawing(MatrixPosition position)
         {

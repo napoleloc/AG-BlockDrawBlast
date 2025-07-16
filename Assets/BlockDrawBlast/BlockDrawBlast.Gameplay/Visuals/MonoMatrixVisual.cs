@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EncosyTower.Logging;
+using EncosyTower.Vaults;
 using UnityEngine;
 
 namespace BlockDrawBlast.Gameplay
@@ -13,9 +14,24 @@ namespace BlockDrawBlast.Gameplay
         
         private readonly Dictionary<MatrixPosition, IMonoBlockVisual> _coordToBlockVisual = new();
 
-        private void Awake()
+        private async void Awake()
         {
-            
+            await InitializeAsync();
+        }
+
+        private async UniTask InitializeAsync()
+        {
+            using var initCts = new CancellationTokenSource();
+            var blockVisualPoolerOpt = await GlobalObjectVault
+                .TryGetAsync(MonoBlockVisualPooler.TypeId, this, initCts.Token);
+                
+            if (blockVisualPoolerOpt.TryValue(out var blockVisualPooler) == false)
+            {
+                DevLoggerAPI.LogError("BlockVisualPooler is not found.");
+                return;
+            }
+                
+            _blockVisualPooler = blockVisualPooler;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

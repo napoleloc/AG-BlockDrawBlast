@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using EncosyTower.Ids;
 using EncosyTower.Logging;
+using EncosyTower.Types;
+using EncosyTower.Vaults;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -9,12 +12,24 @@ namespace BlockDrawBlast.Gameplay
 {
     public class MonoStackManaged : MonoBehaviour
     {
+        public static readonly Id<MonoStackManaged> TypeId = Type<MonoStackManaged>.Id;
+        
         [SerializeField] private MonoStackVisual _monoStackVisual;
 
         private NativeArray<StackBlockData> _unmanagedDataArray;
 
         private int _currentBlockIndex;
-        
+
+        private void Awake()
+        {
+            GlobalObjectVault.TryAdd(TypeId, this);
+        }
+
+        private void OnDestroy()
+        {
+            GlobalObjectVault.TryRemove(TypeId, out _);
+        }
+
         public void PreparedWhenStartGame(ReadOnlySpan<StackBlockData> dataSpan)
         {
             var capacity = dataSpan.Length;

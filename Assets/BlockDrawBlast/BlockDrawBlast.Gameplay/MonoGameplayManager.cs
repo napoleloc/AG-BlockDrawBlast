@@ -1,6 +1,10 @@
+using System.Threading;
 using BlockDrawBlast.Database;
 using BlockDrawBlast.Extensions;
+using Cysharp.Threading.Tasks;
+using EncosyTower.Ids;
 using EncosyTower.Logging;
+using EncosyTower.Vaults;
 using Sirenix.OdinInspector;
 using Unity.Mathematics;
 using UnityEngine;
@@ -9,19 +13,48 @@ namespace BlockDrawBlast.Gameplay
 {
     public class MonoGameplayManager : MonoBehaviour
     {
-        [SerializeField] private LevelDataTableAsset _levelDataTable;
-        [SerializeField] private MonoInputReceiver _inputReceiver;
-        
-        [Title("Managed", titleAlignment: TitleAlignments.Centered)]
-        [SerializeField] private MonoDrawingManaged _monoDrawingManaged;
-        [SerializeField] private MonoMatrixManaged _monoMatrixManaged;
-        [SerializeField] private MonoStackManaged _monoStackManaged;
-
         [Title("Debugging", titleAlignment: TitleAlignments.Centered)] 
-        [SerializeField] private GameplayStatus _gameplayStatus;
+        [SerializeField, ReadOnly] private GameplayStatus _gameplayStatus;
+        
+        private MonoWorldCamera _worldCamera;
+        private MonoInputReceiver _inputReceiver;
+        
+        private MonoDrawingManaged _monoDrawingManaged;
+        private MonoMatrixManaged _monoMatrixManaged;
+        private MonoStackManaged _monoStackManaged;
+        
+        // Database
+        private LevelDataTableAsset _levelDataTable;
         
         private int _currentLevel;
 
+        private async void Awake()
+        {
+            await InitializeAsync();
+        }
+
+        private async UniTask InitializeAsync()
+        {
+            using var initCts = new CancellationTokenSource();
+
+            _worldCamera = await GetAsync(MonoWorldCamera.TypeId, initCts.Token);
+            _inputReceiver = await GetAsync(MonoInputReceiver.TypeId, initCts.Token);
+            
+            _monoDrawingManaged = await GetAsync(MonoDrawingManaged.TypeId, initCts.Token);
+            _monoMatrixManaged = await GetAsync(MonoMatrixManaged.TypeId, initCts.Token);
+            _monoStackManaged = await GetAsync(MonoStackManaged.TypeId, initCts.Token);
+        }
+
+        private async UniTask<T> GetAsync<T>(Id<T> typeId, CancellationToken token)
+        {
+            var valueTOpt = await GlobalObjectVault.TryGetAsync(typeId, this, token);
+            if (valueTOpt.TryValue(out var valueT) != false) return valueT;
+            
+            DevLoggerAPI.LogError("Failed to get object");
+            return default;
+
+        } 
+        
         private void Start()
         {
             _inputReceiver.OnTouchStart += HandleTouchStart;

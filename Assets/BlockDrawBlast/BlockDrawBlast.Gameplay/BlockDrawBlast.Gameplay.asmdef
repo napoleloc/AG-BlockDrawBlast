@@ -13,6 +13,7 @@
         "Unity.Collections",
         "Unity.InputSystem",
         "Unity.Mathematics",
+        "Unity.ResourceManager",
         "Unity.TextMeshPro"
     ],
     "includePlatforms": [],

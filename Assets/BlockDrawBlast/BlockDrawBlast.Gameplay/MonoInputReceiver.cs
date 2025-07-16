@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using EncosyTower.Ids;
+using EncosyTower.Types;
 using EncosyTower.UnityExtensions;
+using EncosyTower.Vaults;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,6 +32,8 @@ namespace BlockDrawBlast.Gameplay
     
     public class MonoInputReceiver : MonoBehaviour
     {
+        public static readonly Id<MonoInputReceiver> TypeId = Type<MonoInputReceiver>.Id;
+        
         [SerializeField] private float _clickTimeThreshold = 0.3f;
         [SerializeField] private float _clickDistanceThreshold = 10f;
         [SerializeField] private float _worldPlaneDistance = 10f;
@@ -49,7 +54,14 @@ namespace BlockDrawBlast.Gameplay
 
         private void Awake()
         {
+            GlobalObjectVault.TryAdd(TypeId, this);
+            
             InitializeInput();
+        }
+
+        private void OnDestroy()
+        {
+            GlobalObjectVault.TryRemove(TypeId, out _);
         }
 
         private void OnEnable()

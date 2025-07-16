@@ -27,8 +27,6 @@ namespace BlockDrawBlast.Gameplay
         {
             _renderer.material = material;
         }
-
-        
     }
 }
 
