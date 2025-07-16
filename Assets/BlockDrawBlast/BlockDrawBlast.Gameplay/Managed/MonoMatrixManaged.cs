@@ -138,9 +138,20 @@ namespace BlockDrawBlast.Gameplay
         private void ProcessKeyUnlocks()
         {
             var availableKeys = _keyCountArray[0];
+            var length = _unmanagedBockDataArray.Length;
+            
+            var unmanagedBlockDataCopy = new NativeArray<BlockData>(length, Allocator.Temp);
+            _unmanagedBockDataArray.CopyTo(unmanagedBlockDataCopy);
+            
+            var unmanagedTileDataCopy = new NativeArray<TileData>(length, Allocator.Temp);
+            _unmanagedTileDataArray.CopyTo(unmanagedTileDataCopy);
 
-            for (var index = 0; index < _unmanagedBockDataArray.Length; index++)
+            for (var index = 0; index < length; index++)
             {
+                // Get a pointer to element
+                // ref var unmanagedBlockData = ref UnsafeUtility.ArrayElementAsRef<BlockData>(
+                //     _unmanagedBockDataArray.GetUnsafePtr(), index);
+                
                 var unmanagedBlockData = _unmanagedBockDataArray[index];
                 if (unmanagedBlockData.blockFlag != BlockFlag.Locked || unmanagedBlockData.requiredKeys <= 0)
                 {
@@ -151,14 +162,16 @@ namespace BlockDrawBlast.Gameplay
                 unmanagedBlockData.requiredKeys -= keysToUse;
                 availableKeys -= keysToUse;
                     
-                _unmanagedBockDataArray[index] = unmanagedBlockData;
-
                 if (unmanagedBlockData.requiredKeys == 0)
                 {
                     var unmanagedTileData = _unmanagedTileDataArray[index];
                     unmanagedTileData.flag &= ~TileFlag.Locked;
                     _unmanagedTileDataArray[index] = unmanagedTileData;
+                    
+                    unmanagedBlockData.blockFlag &= ~BlockFlag.Locked;
                 }
+                
+                _unmanagedBockDataArray[index] = unmanagedBlockData;
                     
                 if(availableKeys == 0) break;
             }
