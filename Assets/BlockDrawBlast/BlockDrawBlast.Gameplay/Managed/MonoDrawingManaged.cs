@@ -39,11 +39,28 @@ namespace BlockDrawBlast.Gameplay
         public void StartDrawing(MatrixPosition position)
         {
             if(_isDrawing) return;
+            
+            if(_monoMatrixManaged.IsValidPosition(position) == false) return;
+
+            _isDrawing = true;
         }
 
         public void ContinueDrawing(MatrixPosition position)
         {
             if(_isDrawing == false) return;
+
+            var validPosition = _monoMatrixManaged.IsValidPosition(position)
+                ? position
+                : _monoMatrixManaged.ClampPosition(position);
+
+            var drawingBlockContext = new DrawingBlockContext()
+            {
+                position = position,
+                colorType = ColorType.Pink
+            };
+            
+            if(_monoMatrixManaged.TryPlaceBlock(position, drawingBlockContext) == false) return;            
+            
         }
 
         public void EndDrawing()
@@ -60,6 +77,7 @@ namespace BlockDrawBlast.Gameplay
             
             _currentDrawingBlocks.Clear();
         }
+        
 
         private bool IsAdjacentToLastBlock(MatrixPosition position)
         {

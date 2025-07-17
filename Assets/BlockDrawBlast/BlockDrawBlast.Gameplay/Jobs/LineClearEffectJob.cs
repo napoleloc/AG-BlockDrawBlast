@@ -45,13 +45,10 @@ namespace BlockDrawBlast.Gameplay
             
             // Check Up
             CheckAdjacentPosition(centerPosition + new int2(0, -1));
-            
             // Check Down  
             CheckAdjacentPosition(centerPosition + new int2(0, 1));
-            
             // Check Left
             CheckAdjacentPosition(centerPosition + new int2(-1, 0));
-            
             // Check Right
             CheckAdjacentPosition(centerPosition + new int2(1, 0));
         }

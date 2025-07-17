@@ -35,7 +35,7 @@ namespace BlockDrawBlast.Gameplay
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public UniTask CreateAsync(MatrixPosition position, BlockData blockData)
+        public UniTask CreateAsync(in MatrixPosition position, in BlockData blockData)
         {
             return CreateAsyncInternal(position, blockData, default);
         }

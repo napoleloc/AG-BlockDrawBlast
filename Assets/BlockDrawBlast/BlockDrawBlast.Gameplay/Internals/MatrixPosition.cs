@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 
 namespace BlockDrawBlast.Gameplay
 {
@@ -17,9 +18,17 @@ namespace BlockDrawBlast.Gameplay
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int2 ToInt2()
+        {
+            return new int2(ColumnIndex, RowIndex);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MatrixPosition FromIndex(int index, int column)
         {
             return new MatrixPosition(index / column, index % column);
         }
+        
+        
     }
 }
