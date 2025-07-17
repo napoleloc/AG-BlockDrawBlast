@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using EncosyTower.Collections;
 using EncosyTower.Ids;
 using EncosyTower.Types;
 using EncosyTower.Vaults;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace BlockDrawBlast.Gameplay
@@ -20,6 +18,9 @@ namespace BlockDrawBlast.Gameplay
         private readonly FasterList<DrawingBlockContext> _currentDrawingBlocks = new();
         private bool _isDrawing;
 
+        private MatrixPosition _lastCoordDrawBlock;
+        private MatrixPosition _firstCoordUndoDrawBlock;
+        
         public System.Action OnDrawingCompleted;
         public System.Action OnDrawingCanceled;
         public System.Action OnDrawingFailed;
@@ -40,8 +41,12 @@ namespace BlockDrawBlast.Gameplay
         {
             if(_isDrawing) return;
             
+            _lastCoordDrawBlock.Dispose();
+            _firstCoordUndoDrawBlock.Dispose();
+            
             if(_monoMatrixManaged.IsValidPosition(position) == false) return;
-
+            if(TryProcessDrawingAtPosition(position) == false) return;
+            
             _isDrawing = true;
         }
 
@@ -53,14 +58,7 @@ namespace BlockDrawBlast.Gameplay
                 ? position
                 : _monoMatrixManaged.ClampPosition(position);
 
-            var drawingBlockContext = new DrawingBlockContext()
-            {
-                position = position,
-                colorType = ColorType.Pink
-            };
-            
-            if(_monoMatrixManaged.TryPlaceBlock(position, drawingBlockContext) == false) return;            
-            
+            TryProcessDrawingAtPosition(validPosition);
         }
 
         public void EndDrawing()
@@ -77,43 +75,24 @@ namespace BlockDrawBlast.Gameplay
             
             _currentDrawingBlocks.Clear();
         }
-        
 
-        private bool IsAdjacentToLastBlock(MatrixPosition position)
+        private bool TryProcessDrawingAtPosition(MatrixPosition position)
         {
-            if(_currentDrawingBlocks.Count == 0) return false;
-            
-            var lastPosition = _currentDrawingBlocks[^1].position;
-            return IsAdjacent(position, lastPosition);
-        }
-
-        private bool IsAdjacentToAnyDrawnBlock(MatrixPosition position)
-        {
-            if(_currentDrawingBlocks.Count == 1) return true;
-            
-            var currentDrawingBlocks = _currentDrawingBlocks.AsSpan();
-            var length = currentDrawingBlocks.Length;
-
-            for (int index = 0; index < length; index++)
+            var drawingBlockContext = new DrawingBlockContext()
             {
-                if (IsAdjacent(position, currentDrawingBlocks[index].position))
-                {
-                    return true;
-                }
-                
-            }
+                position = position,
+                colorType = ColorType.Pink
+            };
             
-            return false;
+            return _monoMatrixManaged.TryPlaceBlock(position, drawingBlockContext);
         }
         
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsAdjacent(MatrixPosition pos1, MatrixPosition pos2)
+        private void CancelDrawingBlock()
         {
-            var rowDiff = math.abs(pos1.RowIndex - pos2.RowIndex);
-            var colDiff = math.abs(pos1.ColumnIndex - pos2.ColumnIndex);
-    
-            // Adjacent = 8 directions  
-            return (rowDiff <= 1 && colDiff <= 1) && (rowDiff + colDiff > 0);
+            if (_currentDrawingBlocks.Count < 1)
+            {
+                return;
+            }
         }
     }
 }

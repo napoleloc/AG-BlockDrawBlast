@@ -23,12 +23,16 @@ namespace BlockDrawBlast.Gameplay
             return new int2(ColumnIndex, RowIndex);
         }
         
+        public MatrixPosition Dispose()
+            => new MatrixPosition(-1, -1);
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MatrixPosition FromIndex(int index, int column)
         {
             return new MatrixPosition(index / column, index % column);
         }
-        
-        
+
+       
+
     }
 }

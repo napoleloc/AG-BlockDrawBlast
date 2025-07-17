@@ -26,6 +26,7 @@ namespace BlockDrawBlast.Gameplay
         private bool IsContinuousPattern()
         {
             var lenght = inputDrawingPath.Length;
+            if(lenght <= 1) return true;
 
             for (int index = 0; index < lenght; index++)
             {

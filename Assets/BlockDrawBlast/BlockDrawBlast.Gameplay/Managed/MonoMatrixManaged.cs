@@ -23,7 +23,7 @@ namespace BlockDrawBlast.Gameplay
         
         private NativeArray<BlockData> _unmanagedBockDataArray;
         private NativeArray<TileData> _unmanagedTileDataArray;
-        private NativeHashMap<int, BlockData> _indexToLockedBlock;
+        private NativeArray<int> _indexToLockedBlockArray;
         private NativeArray<int> _keyCountArray;
         private float3 _originPosition;
         
@@ -65,7 +65,7 @@ namespace BlockDrawBlast.Gameplay
             preparedTileDataArray.CopyTo(_unmanagedTileDataArray);
             var preparedTileDataArrayLenght = preparedTileDataArray.Length;
             
-            _indexToLockedBlock = new NativeHashMap<int, BlockData>(preparedTileDataArrayLenght, Allocator.Persistent);
+            _indexToLockedBlockArray = new NativeArray<int>(preparedTileDataArrayLenght, Allocator.Persistent);
             
             for (int i = 0; i < preparedTileDataArrayLenght; i++)
             {
@@ -81,7 +81,7 @@ namespace BlockDrawBlast.Gameplay
 
                 if ((preparedBlockData.blockFlag & BlockFlag.Locked) == 0)
                 {
-                    _indexToLockedBlock.Add(index, preparedBlockData);
+                    _indexToLockedBlockArray[i] = index;
                 }
                 
                 _unmanagedBockDataArray[index] = preparedBlockData;
@@ -134,7 +134,6 @@ namespace BlockDrawBlast.Gameplay
             var index = position.ToIndex(_columns);
             if (index < 0 || index >= _unmanagedBockDataArray.Length) return true;
             
-            
             var unmanagedTileData = _unmanagedTileDataArray[index];
             return (unmanagedTileData.flag & TileFlag.Occupied) != 0;
         }
@@ -155,9 +154,16 @@ namespace BlockDrawBlast.Gameplay
         {
             var availableKeys = _keyCountArray[0];
             var length = _unmanagedBockDataArray.Length;
-            
-            for (var index = 0; index < length; index++)
+
+            for (int index = 0; index < _indexToLockedBlockArray.Length; index++)
             {
+                var indexToLockedBlock = _indexToLockedBlockArray[index];
+                if (indexToLockedBlock < 0 || indexToLockedBlock >= _unmanagedBockDataArray.Length)
+                {
+                    DevLoggerAPI.LogError($"Invalid index: {indexToLockedBlock}");
+                    continue;
+                }
+                
                 // Get a pointer to an element
                 ref var unmanagedBlockDataRef = ref UnsafeUtility.ArrayElementAsRef<BlockData>(
                     _unmanagedBockDataArray.GetUnsafePtr(), index);
@@ -178,6 +184,7 @@ namespace BlockDrawBlast.Gameplay
             }
             
             _keyCountArray[0] = availableKeys;
+            
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
