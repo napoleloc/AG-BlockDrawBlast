@@ -28,6 +28,8 @@ namespace BlockDrawBlast.Gameplay
         private void OnDestroy()
         {
             GlobalObjectVault.TryRemove(TypeId, out _);
+            
+            
         }
 
         public void PreparedWhenStartGame(ReadOnlySpan<StackBlockData> dataSpan)

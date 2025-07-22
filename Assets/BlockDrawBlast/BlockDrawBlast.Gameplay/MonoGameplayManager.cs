@@ -1,6 +1,6 @@
 using System.Threading;
 using BlockDrawBlast.Database;
-using BlockDrawBlast.Extensions;
+using BlockDrawBlast.Shared;
 using Cysharp.Threading.Tasks;
 using EncosyTower.Ids;
 using EncosyTower.Logging;
@@ -60,6 +60,13 @@ namespace BlockDrawBlast.Gameplay
             _inputReceiver.OnTouchStart += HandleTouchStart;
             _inputReceiver.OnTouchMove += HandleTouchMove;
             _inputReceiver.OnTouchEnd += HandleTouchEnd;
+        }
+        
+        private void OnDestroy()
+        {
+            _inputReceiver.OnTouchStart -= HandleTouchStart;
+            _inputReceiver.OnTouchMove -= HandleTouchMove;
+            _inputReceiver.OnTouchEnd -= HandleTouchEnd;
         }
 
         private void HandleTouchStart(float3 worldPosition)

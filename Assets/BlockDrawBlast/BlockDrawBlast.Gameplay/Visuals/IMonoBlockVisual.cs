@@ -16,17 +16,6 @@ namespace BlockDrawBlast.Gameplay
         IMonoBlockVisualEffect MonoBlockVisualEffect { get; }
     }
 
-    public interface IMonoBlockVisualEffect { }
     
-    
-    public interface IMonoBlockVisualDestructEffectAsync : IMonoBlockVisualEffect
-    {
-        UniTask OnPlayDestructAsync(CancellationToken token);
-    }
-    
-    public interface IMonoBlockVisualSpawnEffectAsync : IMonoBlockVisualEffect
-    {
-        UniTask OnPlaySpawnAsync(CancellationToken token);
-    }
 }
 

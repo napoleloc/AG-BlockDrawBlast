@@ -1,10 +1,8 @@
 using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using EncosyTower.Ids;
 using EncosyTower.Logging;
 using EncosyTower.Types;
-using EncosyTower.UnityExtensions;
 using EncosyTower.Vaults;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -19,12 +17,13 @@ namespace BlockDrawBlast.Gameplay
         
         [SerializeField] private int _rows;
         [SerializeField] private int _columns;
-        [SerializeField] private MonoMatrixVisual _monoMatrixVisual;
+        
+        private MonoMatrixVisual _monoMatrixVisual;
         
         private NativeArray<BlockData> _unmanagedBockDataArray;
         private NativeArray<TileData> _unmanagedTileDataArray;
-        private NativeArray<int> _indexToLockedBlockArray;
-        private NativeArray<int> _keyCountArray;
+        private NativeArray<int> _lockedBlockIndices;
+        private NativeArray<int> _availableKeys;
         private float3 _originPosition;
         
         private bool _isInitialized;
@@ -39,6 +38,7 @@ namespace BlockDrawBlast.Gameplay
         private void OnDestroy()
         {
             GlobalObjectVault.TryRemove(TypeId, out _);
+            Dispose();
         }
 
         public void PreparedWhenStartGame(
@@ -55,19 +55,20 @@ namespace BlockDrawBlast.Gameplay
             
             if(_unmanagedBockDataArray.IsCreated) _unmanagedBockDataArray.Dispose();
             if (_unmanagedTileDataArray.IsCreated) _unmanagedTileDataArray.Dispose();
-            if(_keyCountArray.IsCreated) _keyCountArray.Dispose();
+            if(_lockedBlockIndices.IsCreated) _lockedBlockIndices.Dispose();
+            if(_availableKeys.IsCreated) _availableKeys.Dispose();
             
             _unmanagedBockDataArray = new NativeArray<BlockData>(initialCapacity, Allocator.Persistent);
             _unmanagedTileDataArray = new NativeArray<TileData>(initialCapacity, Allocator.Persistent);
          
-            _keyCountArray = new NativeArray<int>(1, Allocator.Persistent);
+            _availableKeys = new NativeArray<int>(1, Allocator.Persistent);
             
             preparedTileDataArray.CopyTo(_unmanagedTileDataArray);
-            var preparedTileDataArrayLenght = preparedTileDataArray.Length;
+            var blockCount = preparedTileDataArray.Length;
             
-            _indexToLockedBlockArray = new NativeArray<int>(preparedTileDataArrayLenght, Allocator.Persistent);
+            _lockedBlockIndices = new NativeArray<int>(blockCount , Allocator.Persistent);
             
-            for (int i = 0; i < preparedTileDataArrayLenght; i++)
+            for (int i = 0; i < blockCount ; i++)
             {
                 var preparedBlockData = preparedBlockDataArray[i];
                 var position = preparedBlockData.position;
@@ -81,7 +82,7 @@ namespace BlockDrawBlast.Gameplay
 
                 if ((preparedBlockData.blockFlag & BlockFlag.Locked) == 0)
                 {
-                    _indexToLockedBlockArray[i] = index;
+                    _lockedBlockIndices[i] = index;
                 }
                 
                 _unmanagedBockDataArray[index] = preparedBlockData;
@@ -90,6 +91,12 @@ namespace BlockDrawBlast.Gameplay
             
             _isInitialized = true;
         }
+        
+        private bool IsValidIndex(int index)
+        {
+            return index >= 0 && index < _unmanagedBockDataArray.Length;
+        }
+
 
         public unsafe bool TryPlaceBlock(MatrixPosition position, DrawingBlockContext context)
         {
@@ -141,7 +148,9 @@ namespace BlockDrawBlast.Gameplay
         public int CountAvailableSpaces()
         {
             var count = 0;
-            for (var i = 0; i < _unmanagedTileDataArray.Length; i++)
+            var length = _unmanagedBockDataArray.Length;
+            
+            for (var i = 0; i < length; i++)
             {
                 if((_unmanagedTileDataArray[i].flag & TileFlag.Occupied) == 0)
                     count++;
@@ -152,12 +161,12 @@ namespace BlockDrawBlast.Gameplay
 
         private unsafe void ProcessKeyUnlocks()
         {
-            var availableKeys = _keyCountArray[0];
+            var availableKeys = _availableKeys[0];
             var length = _unmanagedBockDataArray.Length;
 
-            for (int index = 0; index < _indexToLockedBlockArray.Length; index++)
+            for (int index = 0; index < _lockedBlockIndices.Length; index++)
             {
-                var indexToLockedBlock = _indexToLockedBlockArray[index];
+                var indexToLockedBlock = _lockedBlockIndices[index];
                 if (indexToLockedBlock < 0 || indexToLockedBlock >= _unmanagedBockDataArray.Length)
                 {
                     DevLoggerAPI.LogError($"Invalid index: {indexToLockedBlock}");
@@ -166,7 +175,7 @@ namespace BlockDrawBlast.Gameplay
                 
                 // Get a pointer to an element
                 ref var unmanagedBlockDataRef = ref UnsafeUtility.ArrayElementAsRef<BlockData>(
-                    _unmanagedBockDataArray.GetUnsafePtr(), index);
+                    _unmanagedBockDataArray.GetUnsafePtr(), indexToLockedBlock);
                 
                 if (unmanagedBlockDataRef.blockFlag != BlockFlag.Locked || unmanagedBlockDataRef.requiredKeys <= 0)
                 {
@@ -183,7 +192,7 @@ namespace BlockDrawBlast.Gameplay
                 }
             }
             
-            _keyCountArray[0] = availableKeys;
+            _availableKeys[0] = availableKeys;
             
         }
         
@@ -236,7 +245,7 @@ namespace BlockDrawBlast.Gameplay
         {
             if(_unmanagedBockDataArray.IsCreated) _unmanagedBockDataArray.Dispose();
             if(_unmanagedTileDataArray.IsCreated) _unmanagedTileDataArray.Dispose();
-            if(_keyCountArray.IsCreated) _keyCountArray.Dispose();
+            if(_availableKeys.IsCreated) _availableKeys.Dispose();
         }
     }
 }

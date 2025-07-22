@@ -3,7 +3,7 @@ using BlockDrawBlast.Database;
 using BlockDrawBlast.Gameplay;
 using Unity.Collections;
 
-namespace BlockDrawBlast.Extensions
+namespace BlockDrawBlast.Shared
 {
     public static class ConvertDataHelper
     {
