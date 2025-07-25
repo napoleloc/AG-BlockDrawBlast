@@ -67,7 +67,7 @@ namespace BlockDrawBlast.Gameplay
             if(Hint.Likely((inputTileData.flag & TileFlag.Occupied) == 0)) return;
             
             var inputBlockData = inputBlockDataArray[index];
-            if(Hint.Likely(inputBlockData.blockFlag ==BlockFlag.Explosive))
+            if(Hint.Likely(inputBlockData.blockFlag == BlockFlag.Explosive))
             {
                 triggeredExplosiveIndices.Add(index);
             }
