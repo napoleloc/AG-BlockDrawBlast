@@ -7,6 +7,7 @@ namespace BlockDrawBlast.Editor.LevelDesigner.Views
     {
         public static readonly string UssClassName = "level-designer-view";
         
+        
         public LevelDesignerView(VisualElement root)
         {
             AddToClassList(UssClassName);
